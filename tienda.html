@@ -3,13 +3,374 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tienda </title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Tienda</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+    /* --- FONDO GENERAL --- */
+    html {
+        min-height: 100%;
+        background: linear-gradient(120deg, #fff 65%, #ffeaea 85%, #ffb3b3 100%);
+        transition: background 0.4s;
+    }
+    body {
+        min-height: 100vh;
+        font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #232946;
+        margin: 0;
+        padding: 0;
+        background: none !important;
+    }
+
+    /* --- HEADER --- */
+    header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 28px 6vw 18px 6vw;
+        background: transparent;
+        border-bottom: 1px solid #ececec;
+    }
+    header h1 {
+        font-size: 2.1rem;
+        font-weight: 800;
+        letter-spacing: 2px;
+        margin: 0;
+        color: #d32f2f;
+        background: linear-gradient(90deg, #d32f2f 0%, #ffb3b3 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .btn-home {
+        background: #fff;
+        color: #d32f2f;
+        border: 1.5px solid #ffb3b3;
+        border-radius: 8px;
+        padding: 8px 18px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        box-shadow: 0 2px 8px rgba(185,131,255,0.07);
+    }
+    .btn-home:hover {
+        background: #ffeaea;
+        color: #b71c1c;
+    }
+    .carrito-icono {
+        position: relative;
+        font-size: 1.6rem;
+        color: #d32f2f;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .carrito-icono:hover {
+        color: #b71c1c;
+    }
+    #contador-carrito {
+        position: absolute;
+        top: -8px;
+        right: -10px;
+        background: #ffb3b3;
+        color: #fff;
+        font-size: 0.85rem;
+        border-radius: 50%;
+        padding: 2px 7px;
+        font-weight: 700;
+    }
+
+    /* --- PRODUCTOS --- */
+    #productos {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 32px;
+        padding: 40px 6vw 0 6vw;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .producto {
+        background: rgba(255,255,255,0.85);
+        border-radius: 18px;
+        box-shadow: 0 4px 24px 0 rgba(211,47,47,0.07);
+        padding: 22px 18px 18px 18px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: box-shadow 0.3s, transform 0.2s;
+        border: 1.5px solid #ffeaea;
+    }
+    .producto:hover {
+        box-shadow: 0 8px 32px 0 rgba(211,47,47,0.13);
+        transform: translateY(-4px) scale(1.03);
+    }
+    .producto img {
+        width: 100%;
+        max-width: 140px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 8px rgba(255,179,179,0.09);
+    }
+    .producto h3 {
+        margin: 0 0 8px 0;
+        font-size: 1.13rem;
+        font-weight: 700;
+        color: #d32f2f;
+        text-align: center;
+    }
+    .producto p {
+        margin: 0 0 12px 0;
+        font-size: 1.05rem;
+        color: #232946;
+        font-weight: 500;
+    }
+    .producto button {
+        background: linear-gradient(90deg, #d32f2f 0%, #ffb3b3 100%);
+        color: #fff;
+        border: none;
+        border-radius: 7px;
+        padding: 8px 18px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(185,131,255,0.08);
+        transition: background 0.2s, transform 0.18s, box-shadow 0.2s;
+    }
+    .producto button:hover {
+        background: linear-gradient(90deg, #b71c1c 0%, #d32f2f 100%);
+        transform: scale(1.06);
+        box-shadow: 0 4px 16px rgba(108,61,217,0.13);
+    }
+
+    /* --- MODALES --- */
+    .modal, .carrito-modal, .pago-modal {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(211, 47, 47, 0.13);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        transition: background 0.3s;
+    }
+    .modal.active, .carrito-modal.active, .pago-modal.active {
+        display: flex;
+    }
+    .modal-contenido, .carrito-contenido, .pago-contenido {
+        background: #fff;
+        border-radius: 18px;
+        padding: 32px 28px 24px 28px;
+        box-shadow: 0 8px 32px 0 rgba(211,47,47,0.13);
+        min-width: 320px;
+        max-width: 95vw;
+        position: relative;
+        animation: fadeInUp 0.6s;
+    }
+    .cerrar {
+        position: absolute;
+        top: 18px;
+        right: 22px;
+        font-size: 1.5rem;
+        color: #ffb3b3;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .cerrar:hover {
+        color: #d32f2f;
+    }
+
+    /* --- CARRITO --- */
+    .carrito-contenido h2 {
+        color: #d32f2f;
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 18px;
+    }
+    .carrito-contenido ul {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 12px 0;
+    }
+    .carrito-contenido p {
+        font-weight: 600;
+        color: #232946;
+    }
+    .carrito-contenido button {
+        margin-right: 10px;
+        margin-top: 10px;
+        background: linear-gradient(90deg, #d32f2f 0%, #ffb3b3 100%);
+        color: #fff;
+        border: none;
+        border-radius: 7px;
+        padding: 7px 16px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(185,131,255,0.08);
+        transition: background 0.2s, transform 0.18s, box-shadow 0.2s;
+    }
+    .carrito-contenido button:hover {
+        background: linear-gradient(90deg, #b71c1c 0%, #d32f2f 100%);
+        transform: scale(1.06);
+        box-shadow: 0 4px 16px rgba(108,61,217,0.13);
+    }
+
+    /* --- FORMULARIO DE PAGO --- */
+    .pago-contenido h2 {
+        color: #d32f2f;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 18px;
+    }
+    #formulario-pago {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    #formulario-pago label {
+        color: #d32f2f;
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+    #formulario-pago input {
+        border: 1.5px solid #ffb3b3;
+        border-radius: 7px;
+        padding: 7px 10px;
+        font-size: 1rem;
+        background: #fff0f0;
+        color: #232946;
+        transition: border 0.2s, background 0.2s;
+    }
+    #formulario-pago input:focus {
+        border-color: #d32f2f;
+        background: #fff;
+        outline: none;
+    }
+    #formulario-pago button {
+        margin-top: 10px;
+        background: linear-gradient(90deg, #d32f2f 0%, #ffb3b3 100%);
+        color: #fff;
+        border: none;
+        border-radius: 7px;
+        padding: 8px 18px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(185,131,255,0.08);
+        transition: background 0.2s, transform 0.18s, box-shadow 0.2s;
+    }
+    #formulario-pago button:hover {
+        background: linear-gradient(90deg, #b71c1c 0%, #d32f2f 100%);
+        transform: scale(1.06);
+        box-shadow: 0 4px 16px rgba(108,61,217,0.13);
+    }
+    .btn-regresar {
+        background: #fff !important;
+        color: #d32f2f !important;
+        border: 1.5px solid #ffb3b3 !important;
+        margin-left: 8px;
+        margin-top: 10px;
+        transition: background 0.2s, color 0.2s;
+    }
+    .btn-regresar:hover {
+        background: #ffeaea !important;
+        color: #b71c1c !important;
+    }
+
+    /* --- ANIMACIONES --- */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(40px);}
+        to { opacity: 1; transform: translateY(0);}
+    }
+
+    /* --- MODO OSCURO --- */
+    body.dark-mode {
+        color: #ffeaea;
+        background: none !important;
+    }
+    html.dark-mode {
+        background: linear-gradient(135deg, #2d1a1a 0%, #411a1a 100%);
+    }
+    body.dark-mode header h1,
+    body.dark-mode .carrito-contenido h2,
+    body.dark-mode .pago-contenido h2,
+    body.dark-mode #formulario-pago label {
+        color: #ffb3b3 !important;
+        background: none;
+        -webkit-background-clip: initial;
+        background-clip: initial;
+        -webkit-text-fill-color: initial;
+    }
+    body.dark-mode .producto {
+        background: rgba(70,30,30,0.85);
+        border: 1.5px solid #2d1a1a;
+        box-shadow: 0 4px 24px 0 rgba(70,30,30,0.13);
+    }
+    body.dark-mode .producto h3 {
+        color: #ffb3b3;
+    }
+    body.dark-mode .producto p {
+        color: #ffeaea;
+    }
+    body.dark-mode .producto button,
+    body.dark-mode .carrito-contenido button,
+    body.dark-mode #formulario-pago button {
+        background: linear-gradient(90deg, #ffb3b3 0%, #d32f2f 100%);
+        color: #2d1a1a;
+    }
+    body.dark-mode .producto button:hover,
+    body.dark-mode .carrito-contenido button:hover,
+    body.dark-mode #formulario-pago button:hover {
+        background: linear-gradient(90deg, #d32f2f 0%, #b71c1c 100%);
+        color: #fff;
+    }
+    body.dark-mode .btn-regresar {
+        background: #2d1a1a !important;
+        color: #ffb3b3 !important;
+        border: 1.5px solid #ffb3b3 !important;
+    }
+    body.dark-mode .btn-regresar:hover {
+        background: #411a1a !important;
+        color: #fff !important;
+    }
+    body.dark-mode .modal-contenido,
+    body.dark-mode .carrito-contenido,
+    body.dark-mode .pago-contenido {
+        background: #2d1a1a;
+        color: #ffeaea;
+    }
+    body.dark-mode #formulario-pago input {
+        background: #411a1a;
+        color: #fff;
+        border-color: #ffb3b3;
+    }
+    body.dark-mode #formulario-pago input:focus {
+        background: #2d1a1a;
+        border-color: #ffb3b3;
+        color: #fff;
+    }
+
+    /* --- ACCESIBILIDAD TEXTO --- */
+    body:not(.dark-mode) label,
+    body:not(.dark-mode) .form-label,
+    body:not(.dark-mode) input,
+    body:not(.dark-mode) select,
+    body:not(.dark-mode) textarea,
+    body:not(.dark-mode) .form-control,
+    body:not(.dark-mode) .form-select {
+        color: #222 !important;
+    }
+    body.dark-mode label,
+    body.dark-mode .form-label,
+    body.dark-mode input,
+    body.dark-mode select,
+    body.dark-mode textarea,
+    body.dark-mode .form-control,
+    body.dark-mode .form-select {
+        color: #fff !important;
+    }
+    </style>
 </head>
 <body>
     <header>
-       
         <a href="index.html" class="btn-home">
             <i class="fas fa-home"></i> Home
         </a>
@@ -33,15 +394,12 @@
             <p>$50000.00</p>
             <button onclick="agregarAlCarrito(2)">Agregar al carrito</button>
         </div>
-
-
         <div class="producto" data-id="4">
             <img src="escape.jpeg" alt="Producto 4">
             <h3>RS3 ESCAPE</h3>
             <p>$15000.00</p>
             <button onclick="agregarAlCarrito(4)">Agregar al carrito</button>
         </div>
-
         <div class="producto" data-id="5">
             <img src="valvula.jpg" alt="Producto 5">
             <h3>VALVULA APR</h3>
@@ -72,9 +430,16 @@
             <p>$8000.00</p>
             <button onclick="agregarAlCarrito(3)">Agregar al carrito</button>
         </div>
-
+        <!-- Example of adding a missing product for sequential IDs -->
+        <div class="producto" data-id="9">
+            <img src="nuevo.jpg" alt="Producto 9">
+            <h3>NUEVO PRODUCTO</h3>
+            <p>$1000.00</p>
+            <button onclick="agregarAlCarrito(9)">Agregar al carrito</button>
+        </div>
     </section>
 
+    <!-- MODAL PRODUCTO AGREGADO -->
     <div id="modal" class="modal">
         <div class="modal-contenido">
             <span class="cerrar" onclick="cerrarModal()">&times;</span>
@@ -82,6 +447,7 @@
         </div>
     </div>
 
+    <!-- MODAL CARRITO -->
     <div id="carrito-modal" class="carrito-modal">
         <div class="carrito-contenido">
             <span class="cerrar" onclick="cerrarCarrito()">&times;</span>
@@ -94,6 +460,7 @@
         </div>
     </div>
 
+    <!-- MODAL PAGO -->
     <div id="pago-modal" class="pago-modal">
         <div class="pago-contenido">
             <span class="cerrar" onclick="cerrarPago()">&times;</span>
@@ -101,386 +468,58 @@
             <form id="formulario-pago" onsubmit="procesarPago(event)">
                 <label for="nombre">Nombre:</label>
                 <input type="text" id="nombre" name="nombre" required>
-
                 <label for="email">Correo Electrónico:</label>
                 <input type="email" id="email" name="email" required>
-
                 <label for="tarjeta">Número de Tarjeta:</label>
                 <input type="text" id="tarjeta" name="tarjeta" required>
-
                 <label for="fecha">Fecha de Expiración:</label>
                 <input type="text" id="fecha" name="fecha" placeholder="MM/YY" required>
-
                 <label for="cvv">CVV:</label>
                 <input type="text" id="cvv" name="cvv" required>
-
                 <button type="submit">Confirmar Pago</button>
                 <button type="button" onclick="cerrarPago()" class="btn-regresar">Regresar</button>
             </form>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
-    <script src="script.js"></script>
+    <script>
+    // MODALES
+    function mostrarCarrito() {
+        document.getElementById('carrito-modal').classList.add('active');
+    }
+    function cerrarCarrito() {
+        document.getElementById('carrito-modal').classList.remove('active');
+    }
+    function mostrarFormularioPago() {
+        cerrarCarrito();
+        document.getElementById('pago-modal').classList.add('active');
+    }
+    function cerrarPago() {
+        document.getElementById('pago-modal').classList.remove('active');
+    }
+    function cerrarModal() {
+        document.getElementById('modal').classList.remove('active');
+    }
+
+    // Simulación de agregar al carrito y mostrar modal
+    function agregarAlCarrito(id) {
+        // Aquí va tu lógica real de carrito...
+        document.getElementById('modal').classList.add('active');
+        setTimeout(cerrarModal, 1200);
+    }
+
+    // Simulación de vaciar carrito
+    function vaciarCarrito() {
+        document.getElementById('lista-carrito').innerHTML = '';
+        document.getElementById('total').textContent = '0.00';
+    }
+
+    // Simulación de pago
+    function procesarPago(event) {
+        event.preventDefault();
+        alert('¡Pago procesado correctamente!');
+        cerrarPago();
+    }
+    </script>
 </body>
 </html>
-
-<style>
-/* --- FONDO GENERAL --- */
-html {
-    min-height: 100%;
-    background: linear-gradient(120deg, #fff 65%, #f3e8ff 85%, #b983ff 100%);
-    transition: background 0.4s;
-}
-body {
-    min-height: 100vh;
-    font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #232946;
-    margin: 0;
-    padding: 0;
-    background: none !important;
-}
-
-/* --- HEADER --- */
-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 28px 6vw 18px 6vw;
-    background: transparent;
-    border-bottom: 1px solid #ececec;
-}
-header h1 {
-    font-size: 2.1rem;
-    font-weight: 800;
-    letter-spacing: 2px;
-    margin: 0;
-    color: #6c3dd9;
-    background: linear-gradient(90deg, #6c3dd9 0%, #b983ff 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-.btn-home {
-    background: #fff;
-    color: #6c3dd9;
-    border: 1.5px solid #b983ff;
-    border-radius: 8px;
-    padding: 8px 18px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 8px rgba(185,131,255,0.07);
-}
-.btn-home:hover {
-    background: #f3e8ff;
-    color: #4b249c;
-}
-.carrito-icono {
-    position: relative;
-    font-size: 1.6rem;
-    color: #6c3dd9;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-.carrito-icono:hover {
-    color: #4b249c;
-}
-#contador-carrito {
-    position: absolute;
-    top: -8px;
-    right: -10px;
-    background: #b983ff;
-    color: #fff;
-    font-size: 0.85rem;
-    border-radius: 50%;
-    padding: 2px 7px;
-    font-weight: 700;
-}
-
-/* --- PRODUCTOS --- */
-#productos {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 32px;
-    padding: 40px 6vw 0 6vw;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-.producto {
-    background: rgba(255,255,255,0.85);
-    border-radius: 18px;
-    box-shadow: 0 4px 24px 0 rgba(108,61,217,0.07);
-    padding: 22px 18px 18px 18px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: box-shadow 0.3s, transform 0.2s;
-    border: 1.5px solid #f3e8ff;
-}
-.producto:hover {
-    box-shadow: 0 8px 32px 0 rgba(108,61,217,0.13);
-    transform: translateY(-4px) scale(1.03);
-}
-.producto img {
-    width: 100%;
-    max-width: 140px;
-    border-radius: 12px;
-    margin-bottom: 12px;
-    box-shadow: 0 2px 8px rgba(185,131,255,0.09);
-}
-.producto h3 {
-    margin: 0 0 8px 0;
-    font-size: 1.13rem;
-    font-weight: 700;
-    color: #6c3dd9;
-    text-align: center;
-}
-.producto p {
-    margin: 0 0 12px 0;
-    font-size: 1.05rem;
-    color: #232946;
-    font-weight: 500;
-}
-.producto button {
-    background: linear-gradient(90deg, #6c3dd9 0%, #b983ff 100%);
-    color: #fff;
-    border: none;
-    border-radius: 7px;
-    padding: 8px 18px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(185,131,255,0.08);
-    transition: background 0.2s, transform 0.18s, box-shadow 0.2s;
-}
-.producto button:hover {
-    background: linear-gradient(90deg, #4b249c 0%, #6c3dd9 100%);
-    transform: scale(1.06);
-    box-shadow: 0 4px 16px rgba(108,61,217,0.13);
-}
-
-/* --- MODALES --- */
-.modal, .carrito-modal, .pago-modal {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(44, 30, 70, 0.18);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    transition: background 0.3s;
-}
-.modal-contenido, .carrito-contenido, .pago-contenido {
-    background: #fff;
-    border-radius: 18px;
-    padding: 32px 28px 24px 28px;
-    box-shadow: 0 8px 32px 0 rgba(108,61,217,0.13);
-    min-width: 320px;
-    max-width: 95vw;
-    position: relative;
-    animation: fadeInUp 0.6s;
-}
-.cerrar {
-    position: absolute;
-    top: 18px;
-    right: 22px;
-    font-size: 1.5rem;
-    color: #b983ff;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-.cerrar:hover {
-    color: #6c3dd9;
-}
-
-/* --- CARRITO --- */
-.carrito-contenido h2 {
-    color: #6c3dd9;
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin-bottom: 18px;
-}
-.carrito-contenido ul {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 12px 0;
-}
-.carrito-contenido p {
-    font-weight: 600;
-    color: #232946;
-}
-.carrito-contenido button {
-    margin-right: 10px;
-    margin-top: 10px;
-    background: linear-gradient(90deg, #6c3dd9 0%, #b983ff 100%);
-    color: #fff;
-    border: none;
-    border-radius: 7px;
-    padding: 7px 16px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(185,131,255,0.08);
-    transition: background 0.2s, transform 0.18s, box-shadow 0.2s;
-}
-.carrito-contenido button:hover {
-    background: linear-gradient(90deg, #4b249c 0%, #6c3dd9 100%);
-    transform: scale(1.06);
-    box-shadow: 0 4px 16px rgba(108,61,217,0.13);
-}
-
-/* --- FORMULARIO DE PAGO --- */
-.pago-contenido h2 {
-    color: #6c3dd9;
-    font-size: 1.2rem;
-    font-weight: 700;
-    margin-bottom: 18px;
-}
-#formulario-pago {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-#formulario-pago label {
-    color: #6c3dd9;
-    font-weight: 600;
-    margin-bottom: 2px;
-}
-#formulario-pago input {
-    border: 1.5px solid #b983ff;
-    border-radius: 7px;
-    padding: 7px 10px;
-    font-size: 1rem;
-    background: #f6f0fa;
-    color: #232946;
-    transition: border 0.2s, background 0.2s;
-}
-#formulario-pago input:focus {
-    border-color: #6c3dd9;
-    background: #fff;
-    outline: none;
-}
-#formulario-pago button {
-    margin-top: 10px;
-    background: linear-gradient(90deg, #6c3dd9 0%, #b983ff 100%);
-    color: #fff;
-    border: none;
-    border-radius: 7px;
-    padding: 8px 18px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(185,131,255,0.08);
-    transition: background 0.2s, transform 0.18s, box-shadow 0.2s;
-}
-#formulario-pago button:hover {
-    background: linear-gradient(90deg, #4b249c 0%, #6c3dd9 100%);
-    transform: scale(1.06);
-    box-shadow: 0 4px 16px rgba(108,61,217,0.13);
-}
-.btn-regresar {
-    background: #fff !important;
-    color: #6c3dd9 !important;
-    border: 1.5px solid #b983ff !important;
-    margin-left: 8px;
-    margin-top: 10px;
-    transition: background 0.2s, color 0.2s;
-}
-.btn-regresar:hover {
-    background: #f3e8ff !important;
-    color: #4b249c !important;
-}
-
-/* --- ANIMACIONES --- */
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(40px);}
-    to { opacity: 1; transform: translateY(0);}
-}
-
-/* --- MODO OSCURO --- */
-body.dark-mode {
-    color: #f3e8ff;
-    background: none !important;
-}
-body.dark-mode html {
-    background: linear-gradient(135deg, #232526 0%, #414345 100%);
-}
-body.dark-mode header h1,
-body.dark-mode .carrito-contenido h2,
-body.dark-mode .pago-contenido h2,
-body.dark-mode #formulario-pago label {
-    color: #b983ff !important;
-    background: none;
-    -webkit-background-clip: initial;
-    -webkit-text-fill-color: initial;
-}
-body.dark-mode .producto {
-    background: rgba(44,30,70,0.85);
-    border: 1.5px solid #2d1457;
-    box-shadow: 0 4px 24px 0 rgba(44,30,70,0.13);
-}
-body.dark-mode .producto h3 {
-    color: #b983ff;
-}
-body.dark-mode .producto p {
-    color: #f3e8ff;
-}
-body.dark-mode .producto button,
-body.dark-mode .carrito-contenido button,
-body.dark-mode #formulario-pago button {
-    background: linear-gradient(90deg, #b983ff 0%, #6c3dd9 100%);
-    color: #232526;
-}
-body.dark-mode .producto button:hover,
-body.dark-mode .carrito-contenido button:hover,
-body.dark-mode #formulario-pago button:hover {
-    background: linear-gradient(90deg, #6c3dd9 0%, #4b249c 100%);
-    color: #fff;
-}
-body.dark-mode .btn-regresar {
-    background: #232526 !important;
-    color: #b983ff !important;
-    border: 1.5px solid #b983ff !important;
-}
-body.dark-mode .btn-regresar:hover {
-    background: #2d1457 !important;
-    color: #fff !important;
-}
-body.dark-mode .modal-contenido,
-body.dark-mode .carrito-contenido,
-body.dark-mode .pago-contenido {
-    background: #232526;
-    color: #f3e8ff;
-}
-body.dark-mode #formulario-pago input {
-    background: #2d1457;
-    color: #fff;
-    border-color: #b983ff;
-}
-body.dark-mode #formulario-pago input:focus {
-    background: #232526;
-    border-color: #b983ff;
-    color: #fff;
-}
-
-/* --- ACCESIBILIDAD TEXTO --- */
-body:not(.dark-mode) label,
-body:not(.dark-mode) .form-label,
-body:not(.dark-mode) input,
-body:not(.dark-mode) select,
-body:not(.dark-mode) textarea,
-body:not(.dark-mode) .form-control,
-body:not(.dark-mode) .form-select {
-    color: #222 !important;
-}
-body.dark-mode label,
-body.dark-mode .form-label,
-body.dark-mode input,
-body.dark-mode select,
-body.dark-mode textarea,
-body.dark-mode .form-control,
-body.dark-mode .form-select {
-    color: #fff !important;
-}
-</style>
